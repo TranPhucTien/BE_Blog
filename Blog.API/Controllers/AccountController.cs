@@ -15,6 +15,7 @@ public class AccountController : Controller
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
     private readonly SignInManager<User> _signInManager;
+    // private readonly IEmailSender _emailSender;
 
     public AccountController(UserManager<User> userManager, ITokenService tokenService, SignInManager<User> signInManager)
     {
@@ -74,10 +75,12 @@ public class AccountController : Controller
                 return BadRequest(ModelState);
             }
 
+            // confirm email and create user have user role
             var user = new User
             {
                 UserName = registerDto.UserName,
-                Email = registerDto.Email
+                Email = registerDto.Email,
+                EmailConfirmed = false,
             };
 
             var createdUser = await _userManager.CreateAsync(user, registerDto.Password);
@@ -118,6 +121,33 @@ public class AccountController : Controller
         {
             await _signInManager.SignOutAsync();
             return Ok("logout success");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e);
+        }
+    }
+
+    [HttpGet("verify-email")]
+    public async Task<IActionResult> VerifyEmail([FromQuery] string email, [FromQuery] string token)
+    {
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                return NotFound("Not found user");
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+
+            if (!result.Succeeded)
+            {
+                return StatusCode(500, result.Errors);
+            }
+
+            return Ok("Email confirmed");
         }
         catch (Exception e)
         {

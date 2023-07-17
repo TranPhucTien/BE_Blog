@@ -5,13 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Blog.DataAccess.Data;
 
-public class ApplicationDbContext : IdentityDbContext<User>
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<User>(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options)
-    {
-    }
-
     public DbSet<Post> Posts { get; set; } = null!;
     public DbSet<Tag> Tags { get; set; } = null!;
     public DbSet<PostTag> PostTags { get; set; } = null!;
@@ -33,14 +28,14 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .HasOne(c => c.User)
             .WithMany()
             .HasForeignKey(c => c.UserId);
-        
+
         modelBuilder.Entity<PostTag>().HasKey(pt => new { pt.PostId, pt.TagId });
-        
+
         modelBuilder.Entity<PostTag>()
             .HasOne(pt => pt.Post)
             .WithMany(p => p.PostTags)
             .HasForeignKey(pt => pt.PostId);
-        
+
         modelBuilder.Entity<PostTag>()
             .HasOne(pt => pt.Tag)
             .WithMany(t => t.PostTags)
@@ -59,21 +54,21 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .HasForeignKey(bm => bm.PostId);
 
 
-
-        List<IdentityRole> roles = new List<IdentityRole>
-        {
-            new IdentityRole
+        List<IdentityRole> roles =
+        [
+            new IdentityRole()
             {
                 Name = "Admin",
                 NormalizedName = "ADMIN"
             },
-            new IdentityRole
+
+            new IdentityRole()
             {
                 Name = "User",
                 NormalizedName = "USER"
             }
-        };
-        
+        ];
+
         modelBuilder.Entity<IdentityRole>().HasData(roles);
 
         modelBuilder.Entity<Tag>().HasData(
@@ -99,13 +94,15 @@ public class ApplicationDbContext : IdentityDbContext<User>
             }
         );
     }
-    
+
     public void RemovePrefix(ModelBuilder modelBuilder)
     {
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes ()) {
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
             var tableName = entityType.GetTableName();
-            
-            if (tableName != null && tableName.StartsWith("AspNet")) {
+
+            if (tableName != null && tableName.StartsWith("AspNet"))
+            {
                 entityType.SetTableName(tableName.Substring(6));
             }
         }

@@ -81,7 +81,7 @@ public class PostController : Controller
 
         var postViewedCookie = Request.Cookies[postId.ToString()];
 
-        if (postViewedCookie != null)
+        if (postViewedCookie == null)
         {
             return Ok(postDto);
         }

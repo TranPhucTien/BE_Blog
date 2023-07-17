@@ -1,0 +1,13 @@
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\bin\Debug\net8.0\Blog.Models.deps.json
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\bin\Debug\net8.0\Blog.Models.dll
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\bin\Debug\net8.0\Blog.Models.pdb
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\obj\Debug\net8.0\Blog.Models.GeneratedMSBuildEditorConfig.editorconfig
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\obj\Debug\net8.0\Blog.Models.AssemblyInfoInputs.cache
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\obj\Debug\net8.0\Blog.Models.AssemblyInfo.cs
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\obj\Debug\net8.0\Blog.Models.csproj.CoreCompileInputs.cache
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\obj\Debug\net8.0\Blog.Models.dll
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\obj\Debug\net8.0\refint\Blog.Models.dll
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\obj\Debug\net8.0\Blog.Models.pdb
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\obj\Debug\net8.0\ref\Blog.Models.dll
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\obj\Debug\net8.0\Blog.Models.csproj.AssemblyReference.cache
+D:\workspace\c#\asp.net\core\Blog\Blog.Models\obj\Debug\net8.0\Blog.Models.sourcelink.json

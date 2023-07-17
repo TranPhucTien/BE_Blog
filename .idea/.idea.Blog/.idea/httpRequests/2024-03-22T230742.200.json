@@ -1,0 +1,12 @@
+{
+  "id": 1,
+  "title": "First blog",
+  "desc": "This is the first blog",
+  "content": "This is the content of the first blog",
+  "authorId": 1,
+  "views": 0,
+  "bookmarks": 0,
+  "createdAt": "2024-03-22T21:12:33",
+  "updatedAt": "2024-03-22T21:12:33",
+  "publishedAt": "2024-03-22T21:12:33"
+}
