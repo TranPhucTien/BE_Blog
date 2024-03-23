@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Blog.Core.Validations;
+using Blog.Models.Validations;
 
 namespace Blog.Models.DTOs.Post;
 
@@ -15,9 +15,6 @@ public class CreatePostDto
 
     [Required]
     public string Content { get; set; } = String.Empty;
-    
-    [Required]
-    public string AuthorId { get; set; }
     
     [Required]
     [CurrentDateOrLater("Ngày xuất bản")]

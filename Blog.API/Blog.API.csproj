@@ -23,12 +23,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Blog.Core\Blog.Core.csproj" />
       <ProjectReference Include="..\Blog.DataAccess\Blog.DataAccess.csproj" />
       <ProjectReference Include="..\Blog.Models\Blog.Models.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="APIs\" />
       <Folder Include="Configurations\" />
     </ItemGroup>
 

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Blog.Core.Validations;
+using Blog.Models.Validations;
 
 namespace Blog.Models.DTOs.Post;
 

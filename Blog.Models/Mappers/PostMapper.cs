@@ -23,14 +23,14 @@ public static class PostMapper
         };
     }
     
-    public static Post ToEntity(this CreatePostDto createPostDto)
+    public static Post ToEntity(this CreatePostDto createPostDto, string AuthorId)
     {
         return new Post
         {
             Title = createPostDto.Title,
             Desc = createPostDto.Desc,
             Content = createPostDto.Content,
-            AuthorId = createPostDto.AuthorId,
+            AuthorId = AuthorId,
             PublishedAt = createPostDto.PublishedAt
         };
     }

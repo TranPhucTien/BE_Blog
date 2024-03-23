@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Blog.Core.Validations;
+namespace Blog.Models.Validations;
 
 public class CurrentDateOrLaterAttribute : ValidationAttribute
 {
