@@ -1,6 +1,7 @@
 ﻿using Blog.Core.Extensions;
 using Blog.Core.Helpers;
 using Blog.DataAccess.Repositories.IRepository;
+using Blog.Models.DTOs;
 using Blog.Models.DTOs.Post;
 using Blog.Models.Entities;
 using Blog.Models.Mappers;
@@ -27,10 +28,23 @@ public class PostController : Controller
     public async Task<IActionResult> GetAllPublished([FromQuery] PostQueryObject query)
     {
         var posts = await _unitOfWork.PostRepository.GetAllFilterAsync(query);
+        
+        var length = posts.Count;
+        var skipNumber = (query.PageNumber - 1) * query.PageSize;
+        posts = posts.Skip(skipNumber).Take(query.PageSize).ToList();
 
-        var postDtos = posts.Where(o => o.PublishedAt < DateTime.Now).Select(p => p.ToDto());
+        var postDtos = posts.Where(o => o.PublishedAt < DateTime.Now).Select(p => p.ToDto()).ToList();
 
-        return Ok(postDtos);
+        var rs = new PaginationDto<List<PostDto>>
+        {
+            Data = postDtos,
+            CurrentPage = query.PageNumber,
+            PageSize = query.PageSize,
+            TotalCount = length,
+            TotalPages = (int)Math.Ceiling((double)length / query.PageSize),
+        };
+
+        return Ok(rs);
     }
 
     [HttpGet("AllByUser")]
@@ -41,10 +55,23 @@ public class PostController : Controller
         var user = await _userManager.FindByNameAsync(username!);
 
         var posts = await _unitOfWork.PostRepository.GetAllPostsUserFilterAsync(user!.Id, query);
+        
+        var length = posts.Count;
+        var skipNumber = (query.PageNumber - 1) * query.PageSize;
+        posts = posts.Skip(skipNumber).Take(query.PageSize).ToList();
 
-        var postDtos = posts.Select(p => p.ToDto());
+        var postDtos = posts.Select(p => p.ToDto()).ToList();
+        
+        var rs = new PaginationDto<List<PostDto>>
+        {
+            Data = postDtos,
+            CurrentPage = query.PageNumber,
+            PageSize = query.PageSize,
+            TotalCount = length,
+            TotalPages = (int)Math.Ceiling((double)length / query.PageSize),
+        };
 
-        return Ok(postDtos);
+        return Ok(rs);
     }
 
     [HttpGet("{postId:int}")]

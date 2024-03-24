@@ -81,16 +81,16 @@ public class PostRepository : Repository<Post>, IPostRepository
         {
             posts = posts.Where(p => p.PostTags.Any(pt => pt.TagId == queryObject.TagId));
         }
-        
-        if (!string.IsNullOrWhiteSpace(queryObject.SortBy))
-        {
-            var sortExpression = $"{queryObject.SortBy} {(queryObject.IsDecsending ? "descending" : "ascending")}";
-            posts = posts.OrderBy(sortExpression);
-        }
 
-        var skipNumber = (queryObject.PageNumber - 1) * queryObject.PageSize;
+        if (string.IsNullOrWhiteSpace(queryObject.SortBy))
+        {
+            return await posts.ToListAsync();
+        }
         
-        return await posts.Skip(skipNumber).Take(queryObject.PageSize).ToListAsync();
+        var sortExpression = $"{queryObject.SortBy} {(queryObject.IsDecsending ? "descending" : "ascending")}";
+        posts = posts.OrderBy(sortExpression);
+
+        return await posts.ToListAsync();
     }
 
     public override async Task<Post?> GetFirstOrDefaultAsync(Expression<Func<Post, bool>> filter, string? includeProperties = null, bool isTracking = true)
@@ -111,14 +111,14 @@ public class PostRepository : Repository<Post>, IPostRepository
             posts = posts.Where(p => p.PostTags.Any(pt => pt.TagId == queryObject.TagId));
         }
 
-        if (!string.IsNullOrWhiteSpace(queryObject.SortBy))
+        if (string.IsNullOrWhiteSpace(queryObject.SortBy))
         {
-            var sortExpression = $"{queryObject.SortBy} {(queryObject.IsDecsending ? "descending" : "ascending")}";
-            posts = posts.OrderBy(sortExpression);
+            return await posts.ToListAsync();
         }
-
-        var skipNumber = (queryObject.PageNumber - 1) * queryObject.PageSize;
         
-        return await posts.Skip(skipNumber).Take(queryObject.PageSize).ToListAsync();
+        var sortExpression = $"{queryObject.SortBy} {(queryObject.IsDecsending ? "descending" : "ascending")}";
+        posts = posts.OrderBy(sortExpression);
+
+        return await posts.ToListAsync();
     }
 }

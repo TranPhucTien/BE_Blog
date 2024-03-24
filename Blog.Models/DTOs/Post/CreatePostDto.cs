@@ -6,7 +6,7 @@ namespace Blog.Models.DTOs.Post;
 public class CreatePostDto
 {
     [Required]
-    [MaxLength(5, ErrorMessage = "Title don't over 200 characters")]
+    [MaxLength(200, ErrorMessage = "Title don't over 200 characters")]
     public string Title { get; set; } = String.Empty;
     
     [Required]
