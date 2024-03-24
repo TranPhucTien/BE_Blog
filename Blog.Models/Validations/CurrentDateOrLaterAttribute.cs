@@ -22,8 +22,7 @@ public class CurrentDateOrLaterAttribute : ValidationAttribute
             return ValidationResult.Success;
         }
 
-        string propertyName = validationContext.DisplayName;
-        string errorMessage = $"{propertyName} phải lớn hơn hoặc bằng ngày hiện tại ({currentDate:d}).";
+        string errorMessage = validationContext.DisplayName;
 
         return new ValidationResult(errorMessage);
     }

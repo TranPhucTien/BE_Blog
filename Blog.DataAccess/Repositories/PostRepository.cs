@@ -26,24 +26,24 @@ public class PostRepository : Repository<Post>, IPostRepository
         return post;
     }
 
-    public async Task<Post?> UpdateAsync(int id, UpdatePostDto updatePostDto)
+    public async Task<Post?> UpdateAsync(int id, Post post)
     {
-        var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == id);
+        var existing = await _db.Posts.Include(a => a.Author).FirstOrDefaultAsync(p => p.Id == id);
 
-        if (post == null)
+        if (existing == null)
         {
             return null;
         }
 
-        post.Title = updatePostDto.Title;
-        post.Content = updatePostDto.Content;
-        post.Desc = updatePostDto.Desc;
-        post.UpdatedAt = DateTime.Now;
-        post.PublishedAt = updatePostDto.PublishedAt;
+        existing.Title = post.Title;
+        existing.Content = post.Content;
+        existing.Desc = post.Desc;
+        existing.UpdatedAt = post.UpdatedAt;
+        existing.PublishedAt = post.PublishedAt;
         
         await _db.SaveChangesAsync();
 
-        return post;
+        return existing;
     }
 
     public async Task<Post?> DeleteAsync(int id)
@@ -90,5 +90,28 @@ public class PostRepository : Repository<Post>, IPostRepository
     public override async Task<Post?> GetFirstOrDefaultAsync(Expression<Func<Post, bool>> filter, string? includeProperties = null, bool isTracking = true)
     {
         return await _db.Posts.Include(a => a.Author).Where(filter).FirstOrDefaultAsync();
+    }
+    
+    public async Task<List<Post>> GetAllPostsUserFilterAsync(string userId, PostUserQueryObject queryObject)
+    {
+        var posts = _db.Posts.Include(a => a.Author).AsQueryable();
+        
+        posts = posts.Where(p => p.AuthorId == userId);
+        
+        if (queryObject.TagId.HasValue)
+        {
+            // TODO: Update this query to filter by tag id
+            // posts = posts.Where(p => p.Tags.Any(t => t.Id == queryObject.TagId));
+        }
+
+        if (!string.IsNullOrWhiteSpace(queryObject.SortBy))
+        {
+            var sortExpression = $"{queryObject.SortBy} {(queryObject.IsDecsending ? "descending" : "ascending")}";
+            posts = posts.OrderBy(sortExpression);
+        }
+
+        var skipNumber = (queryObject.PageNumber - 1) * queryObject.PageSize;
+        
+        return await posts.Skip(skipNumber).Take(queryObject.PageSize).ToListAsync();
     }
 }

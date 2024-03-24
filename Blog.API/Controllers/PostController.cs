@@ -5,7 +5,6 @@ using Blog.Models.DTOs.Post;
 using Blog.Models.Entities;
 using Blog.Models.Mappers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,39 +16,59 @@ public class PostController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<User> _userManager;
+
     public PostController(IUnitOfWork unitOfWork, UserManager<User> userManager)
     {
         this._unitOfWork = unitOfWork;
         this._userManager = userManager;
     }
-    
-    [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] PostQueryObject query)
+
+    [HttpGet("GetAllPublished")]
+    public async Task<IActionResult> GetAllPublished([FromQuery] PostQueryObject query)
     {
         var posts = await _unitOfWork.PostRepository.GetAllFilterAsync(query);
-        
-        var postDtos = posts.Select(p => p.ToDto());
-        
+
+        var postDtos = posts.Where(o => o.PublishedAt < DateTime.Now).Select(p => p.ToDto());
+
         return Ok(postDtos);
     }
-    
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetPostById([FromRoute] int id)
+
+    [HttpGet("GetPostsOfUser")]
+    [Authorize]
+    public async Task<IActionResult> GetAllPostsUser([FromQuery] PostUserQueryObject query)
     {
-        var post = await _unitOfWork.PostRepository.GetFirstOrDefaultAsync(p => p.Id == id);
-        
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var username = User.GetUsername();
+        var user = await _userManager.FindByNameAsync(username!);
+
+        var posts = await _unitOfWork.PostRepository.GetAllPostsUserFilterAsync(user!.Id, query);
+
+        var postDtos = posts.Select(p => p.ToDto());
+
+        return Ok(postDtos);
+    }
+
+    [HttpGet("GetById/{postId:int}")]
+    public async Task<IActionResult> GetPostById([FromRoute] int postId)
+    {
+        var post = await _unitOfWork.PostRepository.GetFirstOrDefaultAsync(p => p.Id == postId);
+
         if (post == null)
         {
             return NotFound();
         }
-        
+
         var postDto = post.ToDto();
-        
+
         return Ok(postDto);
     }
-    
-    [HttpPost]
-    // [Authorize]
+
+    [HttpPost("Create")]
+    [Authorize]
     public async Task<IActionResult> CreatePost([FromBody] CreatePostDto createPostDto)
     {
         if (!ModelState.IsValid)
@@ -58,56 +77,72 @@ public class PostController : Controller
         }
 
         var username = User.GetUsername();
-        
-        if (username == null)
-        {
-            return Unauthorized("Phải đăng nhập để tạo bài viết");
-        }
-        
-        var user = await _userManager.FindByNameAsync(username);
-        
-        if (user == null)
-        {
-            return Unauthorized("Tài khoản không tồn tại");
-        }
-        
-        var postEntity = createPostDto.ToPostFromCreate(user.Id);
-        
+        var user = await _userManager.FindByNameAsync(username!);
+        var postEntity = createPostDto.ToPostFromCreate(user!.Id);
+
         await _unitOfWork.PostRepository.AddAsync(postEntity);
-        
+
         return CreatedAtAction(nameof(GetPostById), new { id = postEntity.Id }, postEntity.ToDto());
     }
-    
-    [HttpPut("{id:int}")]
+
+    [HttpPut("Update/{postId:int}")]
     [Authorize]
-    public async Task<IActionResult> UpdatePost([FromRoute] int id, [FromBody] UpdatePostDto updatePostDto)
+    public async Task<IActionResult> UpdatePost([FromRoute] int postId, [FromBody] UpdatePostDto updatePostDto)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-        
-        var post = await _unitOfWork.PostRepository.UpdateAsync(id, updatePostDto);
-        
+
+        var username = User.GetUsername();
+        var user = await _userManager.FindByNameAsync(username!);
+
+        if (!await IsUserOwnerOfPost(user!.Id, postId))
+        {
+            return Forbid("You are not the owner of this post.");
+        }
+
+        var post = await _unitOfWork.PostRepository.UpdateAsync(postId, updatePostDto.ToPostFromUpdate(user!.Id));
+
         if (post == null)
         {
             return NotFound();
         }
-        
+
         return Ok(post.ToDto());
     }
-    
-    [HttpDelete("{id:int}")]
+
+    [HttpDelete("Delete/{postId:int}")]
     [Authorize]
-    public async Task<IActionResult> DeletePost([FromRoute] int id)
+    public async Task<IActionResult> DeletePost([FromRoute] int postId)
     {
-        var post = await _unitOfWork.PostRepository.DeleteAsync(id);
-        
+        var username = User.GetUsername();
+        var user = await _userManager.FindByNameAsync(username!);
+
+        if (!await IsUserOwnerOfPost(user!.Id, postId))
+        {
+            return Forbid("You are not the owner of this post.");
+        }
+
+        var post = await _unitOfWork.PostRepository.DeleteAsync(postId);
+
         if (post == null)
         {
             return NotFound();
         }
-        
+
         return Ok(post.ToDto());
+    }
+
+    private async Task<bool> IsUserOwnerOfPost(string userId, int postId)
+    {
+        var post = await _unitOfWork.PostRepository.GetFirstOrDefaultAsync(p => p.Id == postId);
+
+        if (post == null)
+        {
+            throw new Exception("Post not found");
+        }
+
+        return post.AuthorId == userId;
     }
 }

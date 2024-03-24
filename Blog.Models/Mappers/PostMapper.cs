@@ -34,4 +34,17 @@ public static class PostMapper
             PublishedAt = postDto.PublishedAt
         };
     }
+    
+    public static Post ToPostFromUpdate(this UpdatePostDto postDto, string authorId)
+    {
+        return new Post
+        {
+            Title = postDto.Title,
+            Desc = postDto.Desc,
+            Content = postDto.Content,
+            AuthorId = authorId,
+            UpdatedAt = DateTime.Now,
+            PublishedAt = postDto.PublishedAt
+        };
+    }
 }

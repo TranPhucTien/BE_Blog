@@ -9,9 +9,11 @@ public interface IPostRepository : IRepository<Post>
 {
     Task<Post> AddAsync(Post post);
     
-    Task<Post?> UpdateAsync(int id, UpdatePostDto updatePostDto);
+    Task<Post?> UpdateAsync(int id, Post post);
     
     Task<Post?> DeleteAsync(int id);
     
     Task<List<Post>> GetAllFilterAsync(PostQueryObject queryObject);
+    
+    Task<List<Post>> GetAllPostsUserFilterAsync(string userId, PostUserQueryObject queryObject);
 }

@@ -6,17 +6,17 @@ namespace Blog.Models.DTOs.Post;
 public class CreatePostDto
 {
     [Required]
-    [MaxLength(200, ErrorMessage = "Tiêu đề không được vượt quá 200 ký tự")]
+    [MaxLength(200, ErrorMessage = "Title don't over 200 characters")]
     public string Title { get; set; } = String.Empty;
     
     [Required]
-    [MaxLength(200, ErrorMessage = "Mô tả không được vượt quá 200 ký tự")]
+    [MaxLength(200, ErrorMessage = "Description don't over 200 characters")]
     public string Desc { get; set; } = String.Empty;
 
     [Required]
     public string Content { get; set; } = String.Empty;
     
     [Required]
-    [CurrentDateOrLater("Ngày xuất bản")]
+    [CurrentDateOrLater("PublishedAt must be current date or later")]
     public DateTime PublishedAt { get; set; } = DateTime.Now;
 }

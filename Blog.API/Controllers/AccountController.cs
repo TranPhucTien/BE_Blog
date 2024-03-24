@@ -37,14 +37,14 @@ public class AccountController : Controller
 
             if (user == null)
             {
-                return Unauthorized("Không tồn tại username");
+                return Unauthorized("Not found user");
             }
 
             var passwordCheck = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
             if (!passwordCheck.Succeeded)
             {
-                return Unauthorized("Sai username hoặc mật khẩu");
+                return Unauthorized("Invalid password");
             }
 
             return Ok(
