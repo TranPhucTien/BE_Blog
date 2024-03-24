@@ -71,10 +71,9 @@ public class PostController : Controller
             return Unauthorized("Tài khoản không tồn tại");
         }
         
-        var postEntity = createPostDto.ToEntity(user.Id);
+        var postEntity = createPostDto.ToPostFromCreate(user.Id);
         
         await _unitOfWork.PostRepository.AddAsync(postEntity);
-        
         
         return CreatedAtAction(nameof(GetPostById), new { id = postEntity.Id }, postEntity.ToDto());
     }

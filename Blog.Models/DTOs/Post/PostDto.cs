@@ -1,4 +1,7 @@
-﻿namespace Blog.Models.DTOs.Post;
+﻿using Blog.Models.DTOs.Account;
+using Blog.Models.Entities;
+
+namespace Blog.Models.DTOs.Post;
 
 public class PostDto
 {
@@ -10,7 +13,7 @@ public class PostDto
 
     public string Content { get; set; } = String.Empty;
     
-    public string AuthorId { get; set; } = String.Empty;
+    public UserDto Author { get; set; } = new UserDto();
     
     public int Views { get; set; } = 0;
     

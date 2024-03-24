@@ -42,10 +42,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
         
         modelBuilder.Entity<IdentityRole>().HasData(roles);
 
-        // modelBuilder.Entity<Post>()
-        //     .Property(e => e.Id)
-        //     .UseMySqlIdentityColumn();
-
 
         // modelBuilder.Entity<User>().HasData(
         //     new User

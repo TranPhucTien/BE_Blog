@@ -1,4 +1,5 @@
 ﻿using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using Blog.Core.Helpers;
 using Blog.DataAccess.Data;
 using Blog.DataAccess.Repositories.IRepository;
@@ -62,7 +63,7 @@ public class PostRepository : Repository<Post>, IPostRepository
 
     public async Task<List<Post>> GetAllFilterAsync(PostQueryObject queryObject)
     {
-        var posts = _db.Posts.AsQueryable();
+        var posts = _db.Posts.Include(a => a.Author).AsQueryable();
         
         if (!string.IsNullOrEmpty(queryObject.AuthorId))
         {
@@ -84,5 +85,10 @@ public class PostRepository : Repository<Post>, IPostRepository
         var skipNumber = (queryObject.PageNumber - 1) * queryObject.PageSize;
         
         return await posts.Skip(skipNumber).Take(queryObject.PageSize).ToListAsync();
+    }
+
+    public override async Task<Post?> GetFirstOrDefaultAsync(Expression<Func<Post, bool>> filter, string? includeProperties = null, bool isTracking = true)
+    {
+        return await _db.Posts.Include(a => a.Author).Where(filter).FirstOrDefaultAsync();
     }
 }

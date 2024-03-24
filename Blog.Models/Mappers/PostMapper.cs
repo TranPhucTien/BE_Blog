@@ -14,7 +14,7 @@ public static class PostMapper
             Title = post.Title,
             Desc = post.Desc,
             Content = post.Content,
-            AuthorId = post.AuthorId,
+            Author = post.Author.ToDto(),
             Views = post.Views,
             Bookmarks = post.Bookmarks,
             CreatedAt = post.CreatedAt,
@@ -23,15 +23,15 @@ public static class PostMapper
         };
     }
     
-    public static Post ToEntity(this CreatePostDto createPostDto, string AuthorId)
+    public static Post ToPostFromCreate(this CreatePostDto postDto, string authorId)
     {
         return new Post
         {
-            Title = createPostDto.Title,
-            Desc = createPostDto.Desc,
-            Content = createPostDto.Content,
-            AuthorId = AuthorId,
-            PublishedAt = createPostDto.PublishedAt
+            Title = postDto.Title,
+            Desc = postDto.Desc,
+            Content = postDto.Content,
+            AuthorId = authorId,
+            PublishedAt = postDto.PublishedAt
         };
     }
 }

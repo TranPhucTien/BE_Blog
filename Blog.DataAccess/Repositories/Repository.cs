@@ -15,7 +15,7 @@ public class Repository<T> : IRepository<T> where T : class
         DbSet = db.Set<T>();
     }
 
-    public async Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string? includeProperties = null, bool isTracking = true)
+    public virtual async Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string? includeProperties = null, bool isTracking = true)
     {
         IQueryable<T> query = DbSet.AsNoTracking();
 

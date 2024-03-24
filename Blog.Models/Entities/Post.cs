@@ -11,9 +11,9 @@ public class Post : BaseEntity
     public string Desc { get; set; } = String.Empty;
 
     public string Content { get; set; } = String.Empty;
-    
-    public string AuthorId { get; set; }
-    
+
+    public string AuthorId { get; set; } = String.Empty;
+
     public User Author { get; set; }
     
     public int Views { get; set; }

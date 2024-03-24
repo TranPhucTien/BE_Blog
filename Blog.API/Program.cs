@@ -1,9 +1,12 @@
+using System.Net;
+using Blog.Core.Helpers;
 using Blog.Core.Services;
 using Blog.DataAccess.Data;
 using Blog.DataAccess.Repositories;
 using Blog.DataAccess.Repositories.IRepository;
 using Blog.Models.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -116,5 +119,27 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseExceptionHandler(config =>
+{
+    config.Run(async context =>
+    {
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        context.Response.ContentType = "application/json";
+        
+        var error = context.Features.Get<IExceptionHandlerFeature>();
+        if (error != null)
+        {
+            var ex = error.Error;
+            await context.Response.WriteAsJsonAsync(new ErrorModel()
+            {
+                StatusCode = context.Response.StatusCode,
+                ErrorMessage = ex.Message
+            });
+        }
+    });
+});
+
+
 
 app.Run();

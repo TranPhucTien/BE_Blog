@@ -6,5 +6,4 @@ namespace Blog.Models.Entities;
 [Table("users")]
 public class User : IdentityUser
 {
-    
 }
