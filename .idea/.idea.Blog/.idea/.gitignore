@@ -116,4 +116,5 @@ UpgradeLog*.XML
 src/.vs/config/applicationhost.config
 
 # JetBrains Rider's auto generated files
-.idea/
+.idea/# GitHub Copilot persisted chat sessions
+/copilot/chatSessions

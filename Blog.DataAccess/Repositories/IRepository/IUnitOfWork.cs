@@ -3,4 +3,5 @@
 public interface IUnitOfWork
 {
     IPostRepository PostRepository { get; }
+    ITagRepository TagRepository { get; }
 }

@@ -5,12 +5,12 @@ namespace Blog.DataAccess.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly ApplicationDbContext _db;
     public IPostRepository PostRepository { get; }
+    public ITagRepository TagRepository { get; }
     
     public UnitOfWork(ApplicationDbContext db)
     {
-        _db = db;
-        PostRepository = new PostRepository(_db);
+        TagRepository = new TagRepository(db);
+        PostRepository = new PostRepository(db);
     }
 }

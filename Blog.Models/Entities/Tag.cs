@@ -6,4 +6,5 @@ namespace Blog.Models.Entities;
 public class Tag : BaseEntity
 {
     public string Name { get; set; } = String.Empty;
+    public List<PostTag> PostTags { get; set; } = new List<PostTag>();
 }

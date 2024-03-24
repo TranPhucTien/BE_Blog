@@ -14,6 +14,8 @@ public class ApplicationDbContext : IdentityDbContext<User>
     }
 
     public DbSet<Post> Posts { get; set; } = null!;
+    public DbSet<Tag> Tags { get; set; } = null!;
+    public DbSet<PostTag> PostTags { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,6 +27,18 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .HasOne(p => p.Author)
             .WithMany()
             .HasForeignKey(p => p.AuthorId);
+        
+        modelBuilder.Entity<PostTag>().HasKey(pt => new { pt.PostId, pt.TagId });
+        
+        modelBuilder.Entity<PostTag>()
+            .HasOne(pt => pt.Post)
+            .WithMany(p => p.PostTags)
+            .HasForeignKey(pt => pt.PostId);
+        
+        modelBuilder.Entity<PostTag>()
+            .HasOne(pt => pt.Tag)
+            .WithMany(t => t.PostTags)
+            .HasForeignKey(pt => pt.TagId);
 
         List<IdentityRole> roles = new List<IdentityRole>
         {
@@ -42,43 +56,28 @@ public class ApplicationDbContext : IdentityDbContext<User>
         
         modelBuilder.Entity<IdentityRole>().HasData(roles);
 
-
-        // modelBuilder.Entity<User>().HasData(
-        //     new User
-        //     {
-        //         Id = 1,
-        //         Username = "tientp",
-        //         Email = "tranphuctien2003nd@gmail.com",
-        //         Password = "123456"
-        //     });
-
-        // modelBuilder.Entity<Tag>().HasData(
-        //     new Tag
-        //     {
-        //         Name = "Lập trình"
-        //     },
-        //     new Tag
-        //     {
-        //         Name = "Công nghệ"
-        //     },
-        //     new Tag
-        //     {
-        //         Name = "OOP"
-        //     }
-        // );
-
-        // modelBuilder.Entity<PostTag>().HasData(
-        //     new PostTag
-        //     {
-        //         PostId = 1,
-        //         TagId = 1
-        //     },
-        //     new PostTag
-        //     {
-        //         PostId = 1,
-        //         TagId = 2
-        //     }
-        // );
+        modelBuilder.Entity<Tag>().HasData(
+            new Tag
+            {
+                Id = 1,
+                Name = "Lập trình"
+            },
+            new Tag
+            {
+                Id = 2,
+                Name = "Công nghệ"
+            },
+            new Tag
+            {
+                Id = 3,
+                Name = "OOP"
+            },
+            new Tag
+            {
+                Id = 4,
+                Name = "Quản lý dự án"
+            }
+        );
     }
     
     public void removePrefix(ModelBuilder modelBuilder)

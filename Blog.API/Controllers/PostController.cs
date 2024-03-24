@@ -23,7 +23,7 @@ public class PostController : Controller
         this._userManager = userManager;
     }
 
-    [HttpGet("GetAllPublished")]
+    [HttpGet("AllPublished")]
     public async Task<IActionResult> GetAllPublished([FromQuery] PostQueryObject query)
     {
         var posts = await _unitOfWork.PostRepository.GetAllFilterAsync(query);
@@ -33,15 +33,10 @@ public class PostController : Controller
         return Ok(postDtos);
     }
 
-    [HttpGet("GetPostsOfUser")]
+    [HttpGet("AllByUser")]
     [Authorize]
     public async Task<IActionResult> GetAllPostsUser([FromQuery] PostUserQueryObject query)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
         var username = User.GetUsername();
         var user = await _userManager.FindByNameAsync(username!);
 
@@ -52,8 +47,8 @@ public class PostController : Controller
         return Ok(postDtos);
     }
 
-    [HttpGet("GetById/{postId:int}")]
-    public async Task<IActionResult> GetPostById([FromRoute] int postId)
+    [HttpGet("{postId:int}")]
+    public async Task<IActionResult> GetById([FromRoute] int postId)
     {
         var post = await _unitOfWork.PostRepository.GetFirstOrDefaultAsync(p => p.Id == postId);
 
@@ -67,33 +62,36 @@ public class PostController : Controller
         return Ok(postDto);
     }
 
-    [HttpPost("Create")]
+    [HttpPost]
     [Authorize]
     public async Task<IActionResult> CreatePost([FromBody] CreatePostDto createPostDto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
         var username = User.GetUsername();
         var user = await _userManager.FindByNameAsync(username!);
         var postEntity = createPostDto.ToPostFromCreate(user!.Id);
+        
+        foreach (var tagId in createPostDto.TagIds)
+        {
+            var tagEntity = _unitOfWork.TagRepository.GetFirstOrDefaultAsync(o => o.Id == tagId).Result;
+            
+            if (tagEntity == null)
+            {
+                return BadRequest("Tag not found");
+            }
+            
+            postEntity.PostTags.Add(new PostTag { Post = postEntity, Tag = tagEntity });
+        }
+        
 
         await _unitOfWork.PostRepository.AddAsync(postEntity);
 
-        return CreatedAtAction(nameof(GetPostById), new { id = postEntity.Id }, postEntity.ToDto());
+        return CreatedAtAction(nameof(GetById), new { postId = postEntity.Id }, postEntity.ToDto());
     }
 
-    [HttpPut("Update/{postId:int}")]
+    [HttpPut("{postId:int}")]
     [Authorize]
     public async Task<IActionResult> UpdatePost([FromRoute] int postId, [FromBody] UpdatePostDto updatePostDto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
         var username = User.GetUsername();
         var user = await _userManager.FindByNameAsync(username!);
 
@@ -102,7 +100,24 @@ public class PostController : Controller
             return Forbid("You are not the owner of this post.");
         }
 
-        var post = await _unitOfWork.PostRepository.UpdateAsync(postId, updatePostDto.ToPostFromUpdate(user!.Id));
+        var postEntity = updatePostDto.ToPostFromUpdate(user.Id);
+        var postTags = new List<PostTag>();
+        
+        foreach (var tagId in updatePostDto.TagIds)
+        {
+            var tagEntity = _unitOfWork.TagRepository.GetFirstOrDefaultAsync(o => o.Id == tagId).Result;
+            
+            if (tagEntity == null)
+            {
+                return BadRequest("Tag not found");
+            }
+            
+            postTags.Add(new PostTag { Post = postEntity, Tag = tagEntity });
+        }
+        
+        postEntity.PostTags = postTags;
+
+        var post = await _unitOfWork.PostRepository.UpdateAsync(postId, postEntity);
 
         if (post == null)
         {
@@ -112,7 +127,7 @@ public class PostController : Controller
         return Ok(post.ToDto());
     }
 
-    [HttpDelete("Delete/{postId:int}")]
+    [HttpDelete("{postId:int}")]
     [Authorize]
     public async Task<IActionResult> DeletePost([FromRoute] int postId)
     {

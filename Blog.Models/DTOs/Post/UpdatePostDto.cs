@@ -7,16 +7,19 @@ public class UpdatePostDto
 {
     [Required]
     [MaxLength(200, ErrorMessage = "Title don't over 200 characters")]
-    public string Title { get; set; } = String.Empty;
+    public string Title { get; set; } = string.Empty;
     
     [Required]
     [MaxLength(200, ErrorMessage = "Description don't over 200 characters")]
-    public string Desc { get; set; } = String.Empty;
+    public string Desc { get; set; } = string.Empty;
 
     [Required]
-    public string Content { get; set; } = String.Empty;
+    public string Content { get; set; } = string.Empty;
     
     [Required]
     [CurrentDateOrLater("PublishedAt must be current date or later")]
     public DateTime PublishedAt { get; set; } = DateTime.Now;
+    
+    [Required]
+    public List<int> TagIds { get; set; } = [];
 }

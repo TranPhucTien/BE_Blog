@@ -15,6 +15,8 @@ public class PostDto
     
     public UserDto Author { get; set; } = new UserDto();
     
+    public List<PostTagDto> PostTags { get; set; } = new List<PostTagDto>();
+    
     public int Views { get; set; } = 0;
     
     public int Bookmarks { get; set; } = 0;

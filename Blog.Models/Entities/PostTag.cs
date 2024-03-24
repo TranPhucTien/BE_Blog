@@ -3,7 +3,7 @@
 namespace Blog.Models.Entities;
 
 [Table("post_tags")]
-public class PostTag : BaseEntity
+public class PostTag
 {
     public int PostId { get; set; }
     public Post Post { get; set; } = null!;

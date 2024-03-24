@@ -28,7 +28,10 @@ public class PostRepository : Repository<Post>, IPostRepository
 
     public async Task<Post?> UpdateAsync(int id, Post post)
     {
-        var existing = await _db.Posts.Include(a => a.Author).FirstOrDefaultAsync(p => p.Id == id);
+        var existing = await _db.Posts
+            .Include(a => a.Author)
+            .Include(p => p.PostTags)
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (existing == null)
         {
@@ -38,6 +41,7 @@ public class PostRepository : Repository<Post>, IPostRepository
         existing.Title = post.Title;
         existing.Content = post.Content;
         existing.Desc = post.Desc;
+        existing.PostTags = post.PostTags;
         existing.UpdatedAt = post.UpdatedAt;
         existing.PublishedAt = post.PublishedAt;
         
@@ -63,7 +67,10 @@ public class PostRepository : Repository<Post>, IPostRepository
 
     public async Task<List<Post>> GetAllFilterAsync(PostQueryObject queryObject)
     {
-        var posts = _db.Posts.Include(a => a.Author).AsQueryable();
+        var posts = _db.Posts
+            .Include(a => a.Author)
+            .Include(p => p.PostTags).ThenInclude(pt => pt.Tag)
+            .AsQueryable();
         
         if (!string.IsNullOrEmpty(queryObject.AuthorId))
         {
@@ -72,8 +79,7 @@ public class PostRepository : Repository<Post>, IPostRepository
 
         if (queryObject.TagId.HasValue)
         {
-            // TODO: Update this query to filter by tag id
-            // posts = posts.Where(p => p.Tags.Any(t => t.Id == queryObject.TagId));
+            posts = posts.Where(p => p.PostTags.Any(pt => pt.TagId == queryObject.TagId));
         }
         
         if (!string.IsNullOrWhiteSpace(queryObject.SortBy))
@@ -89,7 +95,9 @@ public class PostRepository : Repository<Post>, IPostRepository
 
     public override async Task<Post?> GetFirstOrDefaultAsync(Expression<Func<Post, bool>> filter, string? includeProperties = null, bool isTracking = true)
     {
-        return await _db.Posts.Include(a => a.Author).Where(filter).FirstOrDefaultAsync();
+        return await _db.Posts.Include(a => a.Author)
+            .Include(a => a.PostTags).ThenInclude(a => a.Tag)
+            .Where(filter).FirstOrDefaultAsync();
     }
     
     public async Task<List<Post>> GetAllPostsUserFilterAsync(string userId, PostUserQueryObject queryObject)
@@ -100,8 +108,7 @@ public class PostRepository : Repository<Post>, IPostRepository
         
         if (queryObject.TagId.HasValue)
         {
-            // TODO: Update this query to filter by tag id
-            // posts = posts.Where(p => p.Tags.Any(t => t.Id == queryObject.TagId));
+            posts = posts.Where(p => p.PostTags.Any(pt => pt.TagId == queryObject.TagId));
         }
 
         if (!string.IsNullOrWhiteSpace(queryObject.SortBy))

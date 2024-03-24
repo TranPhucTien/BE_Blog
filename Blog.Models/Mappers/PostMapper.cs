@@ -8,6 +8,10 @@ public static class PostMapper
 {
     public static PostDto ToDto(this Post post)
     {
+        var postTags = post.PostTags
+            .Select(pt => new PostTagDto { TagId = pt.Tag.Id, TagName = pt.Tag.Name })
+            .ToList();
+
         return new PostDto
         {
             Id = post.Id,
@@ -15,6 +19,7 @@ public static class PostMapper
             Desc = post.Desc,
             Content = post.Content,
             Author = post.Author.ToDto(),
+            PostTags = postTags,
             Views = post.Views,
             Bookmarks = post.Bookmarks,
             CreatedAt = post.CreatedAt,
@@ -22,7 +27,7 @@ public static class PostMapper
             PublishedAt = post.PublishedAt
         };
     }
-    
+
     public static Post ToPostFromCreate(this CreatePostDto postDto, string authorId)
     {
         return new Post
@@ -34,7 +39,7 @@ public static class PostMapper
             PublishedAt = postDto.PublishedAt
         };
     }
-    
+
     public static Post ToPostFromUpdate(this UpdatePostDto postDto, string authorId)
     {
         return new Post

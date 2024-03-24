@@ -1,4 +1,5 @@
 using System.Net;
+using Blog.Configurations;
 using Blog.Core.Helpers;
 using Blog.Core.Services;
 using Blog.DataAccess.Data;
@@ -94,6 +95,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddScoped<ModelValidationAttribute>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
