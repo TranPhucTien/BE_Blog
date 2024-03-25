@@ -53,6 +53,11 @@ public class PostController : Controller
         {
             return NotFound();
         }
+        
+        if (post.PublishedAt > DateTime.Now && IsUserOwnerOfPost(post.AuthorId, postId).Result == false)
+        {
+            return Forbid("You are not the owner of this post.");
+        }
 
         var postDto = post.ToDto();
 
