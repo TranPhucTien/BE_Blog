@@ -1,6 +1,7 @@
 ﻿using Blog.Core.Services;
 using Blog.Models.DTOs.Account;
 using Blog.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +51,7 @@ public class AccountController : Controller
             return Ok(
                 new NewUserDto
                 {
+                    Id = user.Id,
                     UserName = user.UserName!,
                     Email = user.Email!,
                     Token = _tokenService.CreateToken(user)
@@ -95,11 +97,27 @@ public class AccountController : Controller
             return Ok(
                 new NewUserDto
                 {
+                    Id = user.Id,
                     UserName = user.UserName,
                     Email = user.Email,
                     Token = _tokenService.CreateToken(user)
                 }
             );
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e);
+        }
+    }
+    
+    [HttpPost("logout")]
+    [Authorize]
+    public async Task<IActionResult> Logout()
+    {
+        try
+        {
+            await _signInManager.SignOutAsync();
+            return Ok("logout success");
         }
         catch (Exception e)
         {

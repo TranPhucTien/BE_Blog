@@ -52,4 +52,23 @@ public static class PostMapper
             PublishedAt = postDto.PublishedAt
         };
     }
+    
+    public static PaginationDto<List<PostDto>> ToPaginationFromListPost(this List<Post> list, int pageNumber, int pageSize)
+    {
+        var length = list.Count;
+        
+        var skipNumber = (pageNumber - 1) * pageSize;
+        list = list.Skip(skipNumber).Take(pageSize).ToList();
+
+        var postDtos = list.Select(p => p.ToDto()).ToList();
+        
+        return new PaginationDto<List<PostDto>>
+        {
+            Data = postDtos,
+            CurrentPage = pageNumber,
+            PageSize = pageSize,
+            TotalCount = length,
+            TotalPages = (int)Math.Ceiling((double)length / pageSize),
+        };
+    }
 }

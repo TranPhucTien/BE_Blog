@@ -29,22 +29,7 @@ public class PostController : Controller
     {
         var posts = await _unitOfWork.PostRepository.GetAllFilterAsync(query);
         
-        var length = posts.Count;
-        var skipNumber = (query.PageNumber - 1) * query.PageSize;
-        posts = posts.Skip(skipNumber).Take(query.PageSize).ToList();
-
-        var postDtos = posts.Where(o => o.PublishedAt < DateTime.Now).Select(p => p.ToDto()).ToList();
-
-        var rs = new PaginationDto<List<PostDto>>
-        {
-            Data = postDtos,
-            CurrentPage = query.PageNumber,
-            PageSize = query.PageSize,
-            TotalCount = length,
-            TotalPages = (int)Math.Ceiling((double)length / query.PageSize),
-        };
-
-        return Ok(rs);
+        return Ok(posts.ToPaginationFromListPost(query.PageSize, query.PageNumber));
     }
 
     [HttpGet("AllByUser")]
@@ -55,23 +40,8 @@ public class PostController : Controller
         var user = await _userManager.FindByNameAsync(username!);
 
         var posts = await _unitOfWork.PostRepository.GetAllPostsUserFilterAsync(user!.Id, query);
-        
-        var length = posts.Count;
-        var skipNumber = (query.PageNumber - 1) * query.PageSize;
-        posts = posts.Skip(skipNumber).Take(query.PageSize).ToList();
 
-        var postDtos = posts.Select(p => p.ToDto()).ToList();
-        
-        var rs = new PaginationDto<List<PostDto>>
-        {
-            Data = postDtos,
-            CurrentPage = query.PageNumber,
-            PageSize = query.PageSize,
-            TotalCount = length,
-            TotalPages = (int)Math.Ceiling((double)length / query.PageSize),
-        };
-
-        return Ok(rs);
+        return Ok(posts.ToPaginationFromListPost(query.PageSize, query.PageNumber));
     }
 
     [HttpGet("{postId:int}")]
