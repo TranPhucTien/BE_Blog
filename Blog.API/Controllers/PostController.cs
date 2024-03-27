@@ -17,6 +17,7 @@ public class PostController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<User> _userManager;
+    private static Random rng = new Random();
 
     public PostController(IUnitOfWork unitOfWork, UserManager<User> userManager)
     {
@@ -29,7 +30,9 @@ public class PostController : Controller
     {
         var posts = await _unitOfWork.PostRepository.GetAllFilterAsync(query);
         
-        return Ok(posts.ToPaginationFromListPost(query.PageSize, query.PageNumber));
+        posts = posts.OrderBy(_ => rng.Next()).ToList();
+        
+        return Ok(posts.ToPaginationFromListPost(query.PageNumber, query.PageSize));
     }
 
     [HttpGet("AllByUser")]
@@ -40,8 +43,10 @@ public class PostController : Controller
         var user = await _userManager.FindByNameAsync(username!);
 
         var posts = await _unitOfWork.PostRepository.GetAllPostsUserFilterAsync(user!.Id, query);
+        
+        posts = posts.OrderBy(_ => rng.Next()).ToList();
 
-        return Ok(posts.ToPaginationFromListPost(query.PageSize, query.PageNumber));
+        return Ok(posts.ToPaginationFromListPost(query.PageNumber, query.PageSize));
     }
 
     [HttpGet("{postId:int}")]

@@ -102,7 +102,9 @@ public class PostRepository : Repository<Post>, IPostRepository
     
     public async Task<List<Post>> GetAllPostsUserFilterAsync(string userId, PostUserQueryObject queryObject)
     {
-        var posts = _db.Posts.Include(a => a.Author).AsQueryable();
+        var posts = _db.Posts.Include(a => a.Author)
+            .Include(a => a.PostTags).ThenInclude(a => a.Tag)
+            .AsQueryable();
         
         posts = posts.Where(p => p.AuthorId == userId);
         
