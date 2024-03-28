@@ -12,6 +12,7 @@ namespace Blog.DataAccess.Repositories;
 public class PostRepository : Repository<Post>, IPostRepository
 {
     private readonly ApplicationDbContext _db;
+    private static Random rng = new Random();
 
     public PostRepository(ApplicationDbContext db) : base(db)
     {
@@ -84,7 +85,10 @@ public class PostRepository : Repository<Post>, IPostRepository
 
         if (string.IsNullOrWhiteSpace(queryObject.SortBy))
         {
-            return await posts.ToListAsync();
+            var rs = await posts.ToListAsync();
+            rs = rs.OrderBy(_ => rng.Next()).ToList();
+            
+            return rs;
         }
         
         var sortExpression = $"{queryObject.SortBy} {(queryObject.IsDecsending ? "descending" : "ascending")}";

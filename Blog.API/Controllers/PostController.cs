@@ -17,7 +17,6 @@ public class PostController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<User> _userManager;
-    private static Random rng = new Random();
 
     public PostController(IUnitOfWork unitOfWork, UserManager<User> userManager)
     {
@@ -29,8 +28,7 @@ public class PostController : Controller
     public async Task<IActionResult> GetAllPublished([FromQuery] PostQueryObject query)
     {
         var posts = await _unitOfWork.PostRepository.GetAllFilterAsync(query);
-        
-        posts = posts.OrderBy(_ => rng.Next()).ToList();
+        posts = posts.Where(o => o.PublishedAt <= DateTime.Now).ToList();
         
         return Ok(posts.ToPaginationFromListPost(query.PageNumber, query.PageSize));
     }
@@ -43,8 +41,6 @@ public class PostController : Controller
         var user = await _userManager.FindByNameAsync(username!);
 
         var posts = await _unitOfWork.PostRepository.GetAllPostsUserFilterAsync(user!.Id, query);
-        
-        posts = posts.OrderBy(_ => rng.Next()).ToList();
 
         return Ok(posts.ToPaginationFromListPost(query.PageNumber, query.PageSize));
     }
