@@ -17,7 +17,6 @@ public class UpdatePostDto
     public string Content { get; set; } = string.Empty;
     
     [Required]
-    [CurrentDateOrLater("PublishedAt must be current date or later")]
     public DateTime PublishedAt { get; set; } = DateTime.Now;
     
     [Required]
