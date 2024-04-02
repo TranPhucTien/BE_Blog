@@ -17,6 +17,8 @@ public class Post : BaseEntity
     public User Author { get; set; }
     
     public List<PostTag> PostTags { get; set; } = new List<PostTag>();
+
+    public List<Comment> Comments { get; set; }
     
     public int Views { get; set; }
     

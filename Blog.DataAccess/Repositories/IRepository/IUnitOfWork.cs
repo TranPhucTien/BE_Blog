@@ -4,4 +4,5 @@ public interface IUnitOfWork
 {
     IPostRepository PostRepository { get; }
     ITagRepository TagRepository { get; }
+    ICommentRepository CommentRepository { get; }
 }

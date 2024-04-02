@@ -1,5 +1,4 @@
-﻿using Blog.Models;
-using Blog.Models.Entities;
+﻿using Blog.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -16,17 +15,23 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Post> Posts { get; set; } = null!;
     public DbSet<Tag> Tags { get; set; } = null!;
     public DbSet<PostTag> PostTags { get; set; } = null!;
+    public DbSet<Comment> Comments { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        removePrefix(modelBuilder);
+        RemovePrefix(modelBuilder);
 
         modelBuilder.Entity<Post>()
             .HasOne(p => p.Author)
             .WithMany()
             .HasForeignKey(p => p.AuthorId);
+
+        modelBuilder.Entity<Comment>()
+            .HasOne(c => c.User)
+            .WithMany()
+            .HasForeignKey(c => c.UserId);
         
         modelBuilder.Entity<PostTag>().HasKey(pt => new { pt.PostId, pt.TagId });
         
@@ -39,6 +44,8 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .HasOne(pt => pt.Tag)
             .WithMany(t => t.PostTags)
             .HasForeignKey(pt => pt.TagId);
+
+
 
         List<IdentityRole> roles = new List<IdentityRole>
         {
@@ -80,7 +87,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
         );
     }
     
-    public void removePrefix(ModelBuilder modelBuilder)
+    public void RemovePrefix(ModelBuilder modelBuilder)
     {
         foreach (var entityType in modelBuilder.Model.GetEntityTypes ()) {
             var tableName = entityType.GetTableName();

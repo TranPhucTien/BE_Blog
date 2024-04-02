@@ -7,10 +7,12 @@ public class UnitOfWork : IUnitOfWork
 {
     public IPostRepository PostRepository { get; }
     public ITagRepository TagRepository { get; }
+    public ICommentRepository CommentRepository { get; }
     
     public UnitOfWork(ApplicationDbContext db)
     {
         TagRepository = new TagRepository(db);
         PostRepository = new PostRepository(db);
+        CommentRepository = new CommentRepository(db);
     }
 }
