@@ -15,8 +15,7 @@ public class UpdatePostDto
 
     [Required]
     public string Content { get; set; } = string.Empty;
-    
-    [Required]
+
     public DateTime PublishedAt { get; set; } = DateTime.Now;
     
     [Required]

@@ -17,8 +17,7 @@ public class CreatePostDto
     public string Content { get; set; } = String.Empty;
     
     public List<int> TagIds { get; set; } = new List<int>();
-    
-    [Required]
+
     [CurrentDateOrLater("PublishedAt must be current date or later")]
     public DateTime PublishedAt { get; set; } = DateTime.Now;
     

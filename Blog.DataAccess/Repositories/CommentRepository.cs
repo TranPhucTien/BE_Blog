@@ -2,23 +2,19 @@
 using Blog.Core.Helpers;
 using Blog.DataAccess.Data;
 using Blog.DataAccess.Repositories.IRepository;
+using Blog.Models.DTOs.Comment;
 using Blog.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Blog.DataAccess.Repositories;
 
-public class CommentRepository : Repository<Comment>, ICommentRepository
+public class CommentRepository(ApplicationDbContext db) : Repository<Comment>(db), ICommentRepository
 {
-    private readonly ApplicationDbContext _db;
-
-    public CommentRepository(ApplicationDbContext db) : base(db)
-    {
-        _db = db;
-    }
+    private readonly ApplicationDbContext _db = db;
 
     public async Task<Comment> AddAsync(Comment comment)
     {
-        int rightValue = 1;
+        int rightValue;
 
         if (comment.ParentId != null)
         {
@@ -31,14 +27,12 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
 
             rightValue = parentComment.Right;
 
-            // update many
             var comments = _db.Comments.Where(p => p.PostId == parentComment.PostId && p.Right >= rightValue).ToList();
             foreach (var item in comments)
             {
                 item.Right += 2;
             }
 
-            // update many left
             comments = _db.Comments.Where(p => p.PostId == parentComment.PostId && p.Left > rightValue).ToList();
             foreach (var item in comments)
             {
@@ -61,14 +55,45 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
         return comment;
     }
 
-    public Task<Comment?> UpdateAsync(int id, Comment comment)
+    public async Task<Comment?> UpdateAsync(Comment comment, UpdateCommentDto newComment)
     {
-        throw new NotImplementedException();
+        comment.Content = newComment.Content;
+        comment.UpdatedAt = DateTime.Now;
+
+        await _db.SaveChangesAsync();
+
+        return comment;
     }
 
-    public Task<Comment?> DeleteAsync(int id)
+    public async Task<Comment?> DeleteAsync(Comment comment)
     {
-        throw new NotImplementedException();
+        var left = comment.Left;
+        var right = comment.Right;
+
+        var width = right - left + 1;
+
+        var comments = _db.Comments.Where(p => p.Left >= left && p.Right <= right).ToList();
+        foreach (var item in comments)
+        {
+            _db.Comments.Remove(item);
+        }
+
+        comments = _db.Comments.Where(p => p.Left > right).ToList();
+        foreach (var item in comments)
+        {
+            item.Left -= width;
+        }
+
+        comments = _db.Comments.Where(p => p.Right > right).ToList();
+
+        foreach (var item in comments)
+        {
+            item.Right -= width;
+        }
+
+        await _db.SaveChangesAsync();
+
+        return comment;
     }
 
     public async Task<List<Comment>> GetAllFilterAsync(CommentQueryObject queryObject)

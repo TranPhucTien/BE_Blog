@@ -45,4 +45,52 @@ public class CommentController : Controller
 
         return Ok();
     }
+
+    [HttpPut]
+    [Authorize]
+    public async Task<IActionResult> UpdateComment([FromBody] UpdateCommentDto newComment)
+    {
+        var commentModel = await _unitOfWork.CommentRepository.GetFirstOrDefaultAsync(c => c.Id == newComment.Id);
+
+        if (commentModel == null)
+        {
+            return NotFound();
+        }
+
+        var username = User.GetUsername();
+        var user = await _userManager.FindByNameAsync(username!);
+
+        if (commentModel.UserId != user.Id)
+        {
+            return Forbid("You are not the owner of this comment.");
+        }
+
+        await _unitOfWork.CommentRepository.UpdateAsync(commentModel, newComment);
+
+        return Ok();
+    }
+
+    [HttpDelete("{commentId:int}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteComment([FromRoute] int commentId)
+    {
+        var comment = await _unitOfWork.CommentRepository.GetFirstOrDefaultAsync(c => c.Id == commentId);
+
+        if (comment == null)
+        {
+            return NotFound();
+        }
+
+        var username = User.GetUsername();
+        var user = await _userManager.FindByNameAsync(username!);
+
+        if (comment.UserId != user.Id)
+        {
+            return Forbid("You are not the owner of this comment.");
+        }
+
+        await _unitOfWork.CommentRepository.DeleteAsync(comment);
+
+        return Ok();
+    }
 }

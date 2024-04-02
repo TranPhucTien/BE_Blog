@@ -11,10 +11,6 @@ public class CommentDto
 
     public int? ParentId { get; set; }
 
-    public int Left { get; set; }
-
-    public int Right { get; set; }
-
     public int PostId { get; set; }
 
     public UserDto CreatedBy { get; set; }

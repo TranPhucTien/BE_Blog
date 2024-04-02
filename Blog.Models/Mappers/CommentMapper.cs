@@ -14,8 +14,6 @@ public static class CommentMapper
             Id = comment.Id,
             Content = comment.Content,
             ParentId = comment.ParentId,
-            Left = comment.Left,
-            Right = comment.Right,
             PostId = comment.PostId,
             CreatedBy = comment.User.ToDto(),
             CreatedAt = comment.CreatedAt,
