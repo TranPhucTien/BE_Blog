@@ -16,6 +16,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Tag> Tags { get; set; } = null!;
     public DbSet<PostTag> PostTags { get; set; } = null!;
     public DbSet<Comment> Comments { get; set; } = null!;
+    public DbSet<BookMark> Bookmarks { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

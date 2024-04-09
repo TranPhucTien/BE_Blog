@@ -6,13 +6,18 @@ namespace Blog.DataAccess.Repositories;
 public class UnitOfWork : IUnitOfWork
 {
     public IPostRepository PostRepository { get; }
+
     public ITagRepository TagRepository { get; }
+
     public ICommentRepository CommentRepository { get; }
+
+    public IBookmarkRepository BookmarkRepository { get; }
     
     public UnitOfWork(ApplicationDbContext db)
     {
         TagRepository = new TagRepository(db);
         PostRepository = new PostRepository(db);
         CommentRepository = new CommentRepository(db);
+        BookmarkRepository = new BookmarkRepository(db);
     }
 }
