@@ -12,6 +12,8 @@ public class UnitOfWork : IUnitOfWork
     public ICommentRepository CommentRepository { get; }
 
     public IBookmarkRepository BookmarkRepository { get; }
+
+    public IPostTagRepository PostTagRepository { get; }
     
     public UnitOfWork(ApplicationDbContext db)
     {
@@ -19,5 +21,6 @@ public class UnitOfWork : IUnitOfWork
         PostRepository = new PostRepository(db);
         CommentRepository = new CommentRepository(db);
         BookmarkRepository = new BookmarkRepository(db);
+        PostTagRepository = new PostTagRepository(db);
     }
 }

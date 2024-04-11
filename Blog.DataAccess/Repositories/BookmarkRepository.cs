@@ -18,9 +18,9 @@ public class BookmarkRepository(ApplicationDbContext db) : Repository<BookMark>(
 
     }
 
-    public async Task<BookMark?> DeleteAsync(int bookmarkId)
+    public async Task<BookMark?> DeleteAsync(string userId, int postId)
     {
-        var bookmark = await db.Bookmarks.FirstOrDefaultAsync(p => p.Id == bookmarkId);
+        var bookmark = await db.Bookmarks.FirstOrDefaultAsync(p => p.UserId == userId && p.PostId == postId);
 
         if (bookmark == null)
         {
@@ -33,7 +33,22 @@ public class BookmarkRepository(ApplicationDbContext db) : Repository<BookMark>(
         return bookmark;
     }
 
-    public async Task<List<BookMark>> GetAllFilterAsync(string userId, BookmarkUserQueryObject query)
+    public async Task<List<BookMark>> DeleteAllByPostIdAsync(int postId)
+    {
+        var bookmarks = await db.Bookmarks.Where(p => p.PostId == postId).ToListAsync();
+
+        if (bookmarks.Count == 0)
+        {
+            return new List<BookMark>();
+        }
+
+        db.Bookmarks.RemoveRange(bookmarks);
+        await db.SaveChangesAsync();
+
+        return bookmarks;
+    }
+
+    public async Task<List<BookMark>> GetAllFilterAsync(string? userId, BookmarkUserQueryObject query)
     {
         var bookmarks = db.Bookmarks.Include(b => b.Post).AsQueryable();
 

@@ -149,6 +149,12 @@ public class PostController : Controller
             return NotFound();
         }
 
+        // delete bookmarks
+        await _unitOfWork.BookmarkRepository.DeleteAllByPostIdAsync(postId);
+
+        // delete tags
+        await _unitOfWork.PostTagRepository.DeleteAllByPostIdAsync(postId);
+
         return Ok(post.ToDto());
     }
 

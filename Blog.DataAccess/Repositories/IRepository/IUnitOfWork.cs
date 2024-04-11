@@ -10,4 +10,6 @@ public interface IUnitOfWork
     ICommentRepository CommentRepository { get; }
 
     IBookmarkRepository BookmarkRepository { get; }
+
+    IPostTagRepository PostTagRepository { get; }
 }

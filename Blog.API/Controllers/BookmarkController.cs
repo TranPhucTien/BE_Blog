@@ -47,10 +47,46 @@ public class BookmarkController : Controller
         // increase bookmark count in post
         var post = await _unitOfWork.PostRepository.GetFirstOrDefaultAsync(p => p.Id == bookmark.PostId);
 
+        if (post == null)
+        {
+            return NotFound();
+        }
+
         post.Bookmarks++;
 
-        _unitOfWork.PostRepository.UpdateAsync(post.Id, post);
+        await _unitOfWork.PostRepository.UpdateAsync(post.Id, post);
 
         return Ok(bookmarkAdded);
+    }
+
+    [HttpDelete("{postId:int}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteBookmark(int postId)
+    {
+        var username = User.GetUsername();
+        var user = await _userManager.FindByNameAsync(username!);
+
+        var bookmark = await _unitOfWork.BookmarkRepository.GetFirstOrDefaultAsync(b => b.PostId == postId && b.UserId == user!.Id);
+
+        if (bookmark == null)
+        {
+            return NotFound();
+        }
+
+        // decrease bookmark count in post
+        var post = await _unitOfWork.PostRepository.GetFirstOrDefaultAsync(p => p.Id == bookmark.PostId);
+
+        if (post == null)
+        {
+            return NotFound();
+        }
+
+        post.Bookmarks--;
+
+        await _unitOfWork.PostRepository.UpdateAsync(post.Id, post);
+
+        await _unitOfWork.BookmarkRepository.DeleteAsync(user!.Id, bookmark.PostId);
+
+        return Ok();
     }
 }

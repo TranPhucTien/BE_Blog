@@ -46,6 +46,18 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .WithMany(t => t.PostTags)
             .HasForeignKey(pt => pt.TagId);
 
+        modelBuilder.Entity<BookMark>().HasKey(bm => new { bm.PostId, bm.UserId });
+
+        modelBuilder.Entity<BookMark>()
+            .HasOne(bm => bm.User)
+            .WithMany(u => u.BookMarks)
+            .HasForeignKey(bm => bm.UserId);
+
+        modelBuilder.Entity<BookMark>()
+            .HasOne(bm => bm.Post)
+            .WithMany()
+            .HasForeignKey(bm => bm.PostId);
+
 
 
         List<IdentityRole> roles = new List<IdentityRole>

@@ -11,8 +11,8 @@ public static class BookmarkMapper
     {
         return new BookmarkDto
         {
-            Id = bookmark.Id,
             Post = bookmark.Post.ToDto(),
+            CreatedAt = bookmark.CreatedAt,
         };
     }
 

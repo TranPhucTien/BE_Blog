@@ -3,7 +3,6 @@ using System.Linq.Expressions;
 using Blog.Core.Helpers;
 using Blog.DataAccess.Data;
 using Blog.DataAccess.Repositories.IRepository;
-using Blog.Models.DTOs.Post;
 using Blog.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +17,7 @@ public class PostRepository : Repository<Post>, IPostRepository
     {
         _db = db;
     }
-    
+
     public async Task<Post> AddAsync(Post post)
     {
         await _db.Posts.AddAsync(post);
