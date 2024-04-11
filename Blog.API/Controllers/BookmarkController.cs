@@ -56,7 +56,7 @@ public class BookmarkController : Controller
 
         await _unitOfWork.PostRepository.UpdateAsync(post.Id, post);
 
-        return Ok(bookmarkAdded);
+        return Ok(bookmarkAdded.ToDto());
     }
 
     [HttpDelete("{postId:int}")]
