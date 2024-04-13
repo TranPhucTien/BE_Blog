@@ -6,7 +6,7 @@ namespace Blog.Models.Mappers;
 
 public static class PostMapper
 {
-    public static PostDto ToDto(this Post post)
+    public static PostDto ToDto(this Post post, bool isBookmark = false)
     {
         var postTags = post.PostTags
             .Select(pt => new PostTagDto { TagId = pt.Tag.Id, TagName = pt.Tag.Name })
@@ -22,6 +22,7 @@ public static class PostMapper
             PostTags = postTags,
             Views = post.Views,
             Bookmarks = post.Bookmarks,
+            IsBookmarked = isBookmark,
             CreatedAt = post.CreatedAt,
             UpdatedAt = post.UpdatedAt,
             PublishedAt = post.PublishedAt

@@ -20,6 +20,8 @@ public class PostDto
     public int Views { get; set; } = 0;
     
     public int Bookmarks { get; set; } = 0;
+
+    public bool IsBookmarked { get; set; } = false;
     
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     

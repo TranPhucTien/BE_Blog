@@ -28,9 +28,26 @@ public class PostController : Controller
     public async Task<IActionResult> GetAllPublished([FromQuery] PostQueryObject query)
     {
         var posts = await _unitOfWork.PostRepository.GetAllFilterAsync(query);
+
         posts = posts.Where(o => o.PublishedAt <= DateTime.Now).ToList();
+
+        var rs = posts.ToPaginationFromListPost(query.PageNumber, query.PageSize);
+
+        if (User.Identity?.IsAuthenticated == false)
+        {
+            return Ok(rs);
+        }
+
+        var username = User.GetUsername();
+        var user = await _userManager.FindByNameAsync(username!);
+
+        foreach (var post in rs.Data)
+        {
+            var bookmark = await _unitOfWork.BookmarkRepository.GetFirstOrDefaultAsync(b => b.PostId == post.Id && b.UserId == user!.Id);
+            post.IsBookmarked = bookmark != null;
+        }
         
-        return Ok(posts.ToPaginationFromListPost(query.PageNumber, query.PageSize));
+        return Ok(rs);
     }
 
     [HttpGet("AllByUser")]

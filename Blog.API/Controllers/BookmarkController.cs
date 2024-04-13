@@ -42,8 +42,6 @@ public class BookmarkController : Controller
         var username = User.GetUsername();
         var user = await _userManager.FindByNameAsync(username!);
 
-        var bookmarkAdded = await _unitOfWork.BookmarkRepository.AddAsync(bookmark.ToEntity(user!.Id));
-
         // increase bookmark count in post
         var post = await _unitOfWork.PostRepository.GetFirstOrDefaultAsync(p => p.Id == bookmark.PostId);
 
@@ -53,6 +51,15 @@ public class BookmarkController : Controller
         }
 
         post.Bookmarks++;
+
+        var bookmarkExists = await _unitOfWork.BookmarkRepository.GetFirstOrDefaultAsync(b => b.PostId == bookmark.PostId && b.UserId == user!.Id);
+
+        if (bookmarkExists != null)
+        {
+            return BadRequest("Bookmark already exists.");
+        }
+
+        var bookmarkAdded = await _unitOfWork.BookmarkRepository.AddAsync(bookmark.ToEntity(user!.Id));
 
         await _unitOfWork.PostRepository.UpdateAsync(post.Id, post);
 
