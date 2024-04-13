@@ -62,6 +62,23 @@ public class PostController : Controller
 
         var postDto = post.ToDto();
 
+        var postViewedCookie = Request.Cookies[postId.ToString()];
+
+        if (postViewedCookie != null)
+        {
+            return Ok(postDto);
+        }
+
+        var cookieOptions = new CookieOptions
+        {
+            Expires = DateTime.Now.AddMinutes(10),
+        };
+
+        Response.Cookies.Append(postId.ToString(), "viewed", cookieOptions);
+
+        post.Views++;
+        await _unitOfWork.PostRepository.UpdateAsync(post.Id, post);
+
         return Ok(postDto);
     }
 
