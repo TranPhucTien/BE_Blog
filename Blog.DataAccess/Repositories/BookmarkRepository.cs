@@ -50,7 +50,13 @@ public class BookmarkRepository(ApplicationDbContext db) : Repository<BookMark>(
 
     public async Task<List<BookMark>> GetAllFilterAsync(string? userId, BookmarkUserQueryObject query)
     {
-        var bookmarks = db.Bookmarks.Include(b => b.Post).AsQueryable();
+        var bookmarks = db.Bookmarks
+            .Include(b => b.Post)
+            .ThenInclude(p => p.PostTags)
+            .ThenInclude(pt => pt.Tag)
+            .Include(b => b.Post)
+            .ThenInclude(p => p.Author)
+            .AsQueryable();
 
         if (userId != null)
         {
